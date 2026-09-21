@@ -1,7 +1,7 @@
 import { Obj, Thunk, Type } from '@ephox/katamari';
 import { SandHTMLElement } from '@ephox/sand';
-import { Editor } from 'tinymce';
-import { getTinymce, withTinymceInstance } from './TinyMCE';
+import type { Editor } from 'editor42';
+import { getEditor42, hasEditor42, withEditor42Instance } from './Editor42';
 
 /**
  * Run a callback for each editor inside the subject elements.
@@ -12,9 +12,13 @@ const withEachContainedEditor = (
   subject: JQuery<HTMLElement>,
   callback: (ed: Editor, inside: HTMLElement, subject: JQuery<HTMLElement>) => void | false
 ) => {
-  // Look for editors that are contained within the jQuery subjects
+  // Look for editors that are contained within the jQuery subjects; with no engine on
+  // the page there is nothing to look for (the patches outlive a removed engine)
+  if (!hasEditor42()) {
+    return;
+  }
   subject.each((i, elem) => {
-    for (const editor of getTinymce().get()) {
+    for (const editor of getEditor42().get()) {
       if ($.contains(elem, editor.getContentAreaContainer())) {
         if (callback(editor, elem, subject) === false) {
           return false;
@@ -34,7 +38,7 @@ const withEachLinkedEditor = (
   subject: JQuery<HTMLElement>,
   callback: (ed: Editor, associated: HTMLElement, subject: JQuery<HTMLElement>) => void | false
 ) => {
-  subject.each((_i, elm) => withTinymceInstance(elm, (ed) => callback(ed, elm, subject)));
+  subject.each((_i, elm) => withEditor42Instance(elm, (ed) => callback(ed, elm, subject)));
 };
 
 /**
@@ -87,7 +91,7 @@ const patchJqAttr = (origAttrFn: JQueryAttrFn): JQueryAttrFn =>
       // a element inside the editor. This is meant to remove those editors
       // before we accidentally overwrite them.
       removeChildEditors(this);
-      this.each((i, elm) => withTinymceInstance(elm, (ed) => {
+      this.each((i, elm) => withEditor42Instance(elm, (ed) => {
         const value = Type.isFunction(valueOrProducer) ? valueOrProducer.call(elm, i, ed.getContent()) : valueOrProducer;
         if (value !== undefined) {
           ed.setContent(value === null ? '' : `${value}`);
@@ -118,7 +122,7 @@ const patchJqAttr = (origAttrFn: JQueryAttrFn): JQueryAttrFn =>
       } else {
         // when the value is undefined get the value
         if (this.length >= 1) {
-          return withTinymceInstance(this[0],
+          return withEditor42Instance(this[0],
             (ed) => ed.getContent(),
             (_elm) => origAttrFn.call(this, 'value')
           );
@@ -215,7 +219,7 @@ const patchJqPend = (origFn: JQueryPendFn, position: 'append' | 'prepend'): JQue
       const content = args as JQueryPendContent[];
       contentStr = Thunk.cached((_el: HTMLElement, _origContent: string) => stringifyContent(origFn, content));
     }
-    this.each((_i2, elm) => withTinymceInstance(elm,
+    this.each((_i2, elm) => withEditor42Instance(elm,
       (ed) => {
         const oldContent = ed.getContent();
         const addition = contentStr(elm, oldContent);
@@ -252,7 +256,7 @@ const patchJqHtml = (origFn: JQueryHtmlFn): JQueryHtmlFn =>
     if (arguments.length === 0) { // get the HTML value
       if (this.length >= 1) {
         // when more than one item exists the value of the first one is retrieved
-        return withTinymceInstance(this[0], (ed) => ed.getContent(), (el) => origFn.call($(el)));
+        return withEditor42Instance(this[0], (ed) => ed.getContent(), (el) => origFn.call($(el)));
       }
       // Though this is not in the types; experimentation shows
       // that when no item is present jQuery returns `undefined`.
@@ -264,7 +268,7 @@ const patchJqHtml = (origFn: JQueryHtmlFn): JQueryHtmlFn =>
       removeChildEditors(this);
       // for all the nodes
       this.each((i, el) => {
-        withTinymceInstance(el, (ed) => {
+        withEditor42Instance(el, (ed) => {
           // evaluate any producer to get the value
           const htmlOrNode = (
             Type.isFunction(htmlOrNodeOrProducer)
@@ -326,7 +330,7 @@ const patchJqText = (origFn: JQueryTextFn): JQueryTextFn =>
       // when no elements in the set it returns empty string
       let out = '';
       this.each((_i, el) => {
-        out += withTinymceInstance(el,
+        out += withEditor42Instance(el,
           (ed) => ed.getContent({ format: 'text' }),
           (elm) => origFn.call($(elm))
         );
@@ -338,7 +342,7 @@ const patchJqText = (origFn: JQueryTextFn): JQueryTextFn =>
       removeChildEditors(this);
       // for all the nodes
       this.each((i, el) => {
-        withTinymceInstance(el, (ed) => {
+        withEditor42Instance(el, (ed) => {
           // evaluate any producer to get the value
           const val = Type.isFunction(valueOrProducer) ? valueOrProducer.call(el, i, ed.getContent({ format: 'text' })) : valueOrProducer;
           // set the text on a dummy element so we can extract the HTML and set it on TinyMCE
@@ -378,14 +382,14 @@ const patchJqVal = (origFn: JQueryValFn): JQueryValFn =>
     // behave like original jQuery if argument is omitted
     if (arguments.length === 0) {
       if (this.length >= 1) {
-        return withTinymceInstance(this[0], (ed) => ed.getContent(), (elm) => origFn.call($(elm)));
+        return withEditor42Instance(this[0], (ed) => ed.getContent(), (elm) => origFn.call($(elm)));
       }
       // when no elements exist to query simply return undefined
       return undefined;
     } else {
       type ValSetterType = (valueOrProducer: JQueryValValue | JQueryValProducer) => JQuery<HTMLElement>;
       this.each((i, el) => {
-        withTinymceInstance(el, (ed) => {
+        withEditor42Instance(el, (ed) => {
           const val = Type.isFunction(valueOrProducer) ? valueOrProducer.call(el, i, ed.getContent()) : valueOrProducer ?? '';
           // We don't expect to be given arrays/numbers but it's in the type...
           const html = Type.isArray(val) ? val.join('') : `${val}`;

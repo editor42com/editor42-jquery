@@ -2,7 +2,7 @@
 import { ApproxStructure, Assertions } from '@ephox/agar';
 import { after, before, context, describe, it } from '@ephox/bedrock-client';
 import { SugarElement } from '@ephox/sugar';
-import { Editor } from 'tinymce';
+import type { Editor } from 'editor42';
 import { setupIntegration } from '../../../main/ts/Integration';
 import { createHTML, removeTinymce } from '../Utils';
 

@@ -1,7 +1,7 @@
-import { Editor, RawEditorOptions, TinyMCE as TinyMCEGlobal } from 'tinymce';
+import type { Editor, RawEditorOptions, Editor42 as Editor42Global } from 'editor42';
 import { getJquery } from './JQuery';
 import { patchJQueryFunctions } from './Patch';
-import { loadTinymce, getTinymceInstance } from './TinyMCE';
+import { loadEditor42, getEditor42Instance } from './Editor42';
 
 export interface RawEditorExtendedSettings extends RawEditorOptions {
   script_url?: string;
@@ -15,7 +15,11 @@ export interface RawEditorExtendedSettings extends RawEditorOptions {
 
 declare global {
   interface JQuery<TElement = HTMLElement> extends Iterable<TElement> {
+    editor42(): Editor;
+    editor42(settings: RawEditorExtendedSettings): Promise<Editor[]>;
+    /** Deprecated alias of editor42(). */
     tinymce(): Editor;
+    /** Deprecated alias of editor42(). */
     tinymce(settings: RawEditorExtendedSettings): Promise<Editor[]>;
   }
 }
@@ -32,7 +36,7 @@ export const getScriptSrc = (settings: RawEditorExtendedSettings): string => {
   }
 };
 
-const getEditors = (tinymce: TinyMCEGlobal, self: JQuery<HTMLElement>): Editor[] => {
+const getEditors = (tinymce: Editor42Global, self: JQuery<HTMLElement>): Editor[] => {
   const out: Editor[] = [];
   self.each((i, ele) => {
     const ed = tinymce.get(ele.id);
@@ -43,7 +47,7 @@ const getEditors = (tinymce: TinyMCEGlobal, self: JQuery<HTMLElement>): Editor[]
   return out;
 };
 
-const resolveFunction = <F extends Function> (tiny: TinyMCEGlobal, fnOrStr: unknown): F | null => {
+const resolveFunction = <F extends Function> (tiny: Editor42Global, fnOrStr: unknown): F | null => {
   if (typeof fnOrStr === 'string') {
     const func: unknown = tiny.resolve(fnOrStr);
     if (typeof func === 'function') {
@@ -66,7 +70,7 @@ const tinymceFn = function (this: JQuery<HTMLElement>, settings?: RawEditorExten
 
   // Get editor instance
   if (!settings) {
-    return getTinymceInstance(this[0]) ?? undefined;
+    return getEditor42Instance(this[0]) ?? undefined;
   }
 
   // Hide textarea to avoid flicker
@@ -74,7 +78,7 @@ const tinymceFn = function (this: JQuery<HTMLElement>, settings?: RawEditorExten
 
   return new Promise<Editor[]>((resolve) => {
     // Load tinymce
-    loadTinymce(getScriptSrc(settings), (tinymce, loadedFromProvidedUrl) => {
+    loadEditor42(getScriptSrc(settings), (engine, loadedFromProvidedUrl) => {
       // Execute callback after tinymce has been loaded and before the initialization occurs
       if (loadedFromProvidedUrl && settings.script_loaded) {
         settings.script_loaded();
@@ -87,9 +91,9 @@ const tinymceFn = function (this: JQuery<HTMLElement>, settings?: RawEditorExten
 
       // track how many editors have initialized so we can run a callback
       let initCount = 0;
-      const allInitCallback = resolveFunction<AllInitFn>(tinymce, settings.oninit);
+      const allInitCallback = resolveFunction<AllInitFn>(engine, settings.oninit);
       const allInitialized = () => {
-        const editors = getEditors(tinymce, this);
+        const editors = getEditors(engine, this);
         if (allInitCallback) {
           allInitCallback(editors);
         }
@@ -101,11 +105,11 @@ const tinymceFn = function (this: JQuery<HTMLElement>, settings?: RawEditorExten
 
         // Generate unique id for target element if needed
         if (!elm.id) {
-          elm.id = tinymce.DOM.uniqueId();
+          elm.id = engine.DOM.uniqueId();
         }
 
         // Only init the editor once
-        if (tinymce.get(elm.id)) {
+        if (engine.get(elm.id)) {
           initCount++;
           return;
         }
@@ -123,14 +127,14 @@ const tinymceFn = function (this: JQuery<HTMLElement>, settings?: RawEditorExten
         };
 
         // Create editor instance and render it
-        tinymce.init({
+        engine.init({
           ...settings,
           selector: undefined,
           target: elm,
           init_instance_callback: initInstanceCallback
         }).catch((err) => {
           /* eslint-disable-next-line no-console */
-          console.error('TinyMCE init failed', err);
+          console.error('editor init failed', err);
         });
       }); // this.each
 
@@ -145,13 +149,17 @@ const tinymceFn = function (this: JQuery<HTMLElement>, settings?: RawEditorExten
 export const setupIntegration = () => {
   const jq = getJquery();
 
-  // Add :tinymce pseudo selector this will select elements that has been converted into editor instances
-  // it's now possible to use things like $('*:tinymce') to get all TinyMCE bound elements.
-  // Take advantage of jQuery's createPseudo API in v4 while still supports the older versions
-  jq.expr.pseudos.tinymce = jq.expr.createPseudo ?
-    jq.expr.createPseudo(( _text ) => ( elem ) => !!getTinymceInstance( elem ))
-    : (e: Element) => !!getTinymceInstance(e);
+  // Add the :editor42 pseudo selector to select elements that have been converted into
+  // editor instances, so things like $('*:editor42') get all bound elements. :tinymce
+  // stays as a deprecated alias. Take advantage of jQuery's createPseudo API in v4
+  // while still supporting the older versions.
+  const boundPseudo = jq.expr.createPseudo ?
+    jq.expr.createPseudo(( _text ) => ( elem ) => !!getEditor42Instance( elem ))
+    : (e: Element) => !!getEditor42Instance(e);
+  jq.expr.pseudos.editor42 = boundPseudo;
+  jq.expr.pseudos.tinymce = boundPseudo;
 
-  // Add a tinymce function for creating editors
+  // Add an editor42 function for creating editors; tinymce stays as a deprecated alias
+  (jq.fn as any).editor42 = tinymceFn;
   (jq.fn as any).tinymce = tinymceFn;
 };

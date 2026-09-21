@@ -3,7 +3,7 @@ import { after, before, describe, it } from '@ephox/bedrock-client';
 import { Class, Insert, Remove, SelectorFilter, SugarBody, SugarElement } from '@ephox/sugar';
 import { setupIntegration } from '../../../main/ts/Integration';
 import { Arr } from '@ephox/katamari';
-import { Editor } from 'tinymce';
+import type { Editor } from 'editor42';
 import { removeTinymce } from '../Utils';
 
 describe('LoadTest', () => {

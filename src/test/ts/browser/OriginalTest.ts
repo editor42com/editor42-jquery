@@ -2,9 +2,9 @@ import { Assertions, Waiter } from '@ephox/agar';
 import { after, before, describe, it } from '@ephox/bedrock-client';
 import { Arr } from '@ephox/katamari';
 import { Class, Html, Insert, Remove, SelectorFilter, SugarBody, SugarElement } from '@ephox/sugar';
-import { getTinymce } from '../../../main/ts/TinyMCE';
+import { getEditor42 } from '../../../main/ts/Editor42';
 import { setupIntegration } from 'src/main/ts/Integration';
-import { removeTinymce } from '../Utils';
+import { removeAllEngines } from '../Utils';
 
 describe('OriginalTest', () => {
   const setup = () => {
@@ -25,20 +25,19 @@ describe('OriginalTest', () => {
     setup();
 
     await $('#elm1,#elm2').tinymce({
-      license_key: 'gpl',
       script_url: '/project/node_modules/tinymce/tinymce.js',
     });
     await Waiter.pTryUntil('Editors should be initialized', () => {
-      const ed1 = getTinymce().get('elm1');
-      const ed2 = getTinymce().get('elm2');
+      const ed1 = getEditor42().get('elm1');
+      const ed2 = getEditor42().get('elm2');
       return ed1?.initialized && ed2?.initialized;
     });
   });
 
   after(() => {
-    (getTinymce().EditorManager as any).remove();
+    (getEditor42().EditorManager as any).remove();
     Arr.map(SelectorFilter.all('div.test-editor'), Remove.remove);
-    removeTinymce();
+    removeAllEngines();
   });
 
   it('Get editor instance', () => {
@@ -48,7 +47,7 @@ describe('OriginalTest', () => {
   });
 
   it('Get contents using jQuery', () => {
-    getTinymce().get('elm1')?.setContent('<p>Editor 1</p>');
+    getEditor42().get('elm1')?.setContent('<p>Editor 1</p>');
     Assertions.assertEq('html()', '<p>Editor 1</p>', $('#elm1').html());
     Assertions.assertEq('val()', '<p>Editor 1</p>', $('#elm1').val());
     Assertions.assertEq('attr(value)', '<p>Editor 1</p>', $('#elm1').attr('value'));
@@ -70,7 +69,7 @@ describe('OriginalTest', () => {
   });
 
   it('append/prepend contents using jQuery', () => {
-    getTinymce().get('elm1')?.setContent('<p>Editor 1</p>');
+    getEditor42().get('elm1')?.setContent('<p>Editor 1</p>');
 
     $('#elm1').append('<p>Test 1</p>');
     Assertions.assertEq('after append', '<p>Editor 1</p>\n<p>Test 1</p>', $('#elm1').html());
@@ -97,7 +96,6 @@ describe('OriginalTest', () => {
 
   it('applyPatch is only called once', () => {
     const options = {
-      license_key: 'gpl',
       script_url: '/project/node_modules/tinymce/tinymce.js',
     };
 

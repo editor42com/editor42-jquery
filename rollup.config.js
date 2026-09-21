@@ -4,7 +4,7 @@ const terser = require('@rollup/plugin-terser');
 const build = (minify) => ({
   input: 'lib/main/ts/Main.js',
   output: {
-    file: 'dist/tinymce-jquery' + (minify ? '.min' : '') + '.js',
+    file: 'dist/editor42-jquery' + (minify ? '.min' : '') + '.js',
     format: 'iife'
   },
   treeshake: true,

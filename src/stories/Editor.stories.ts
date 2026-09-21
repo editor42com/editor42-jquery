@@ -4,7 +4,7 @@ import { StoryFn, Meta } from '@storybook/html';
 setupIntegration();
 
 export default {
-  title: 'TinyMCE Editor'
+  title: 'Editor42'
 } as Meta;
 
 let count = 0;
@@ -17,7 +17,7 @@ const Template: StoryFn<RawEditorExtendedSettings> = (args) => {
     $(mountNode).after(`<div id="tiny${mount}"><p>The quick brown fox jumps over the lazy dog.</p></div>`);
     $(`div#tiny${mount}`).tinymce(args).catch((err) => {
       /* eslint-disable-next-line no-console */
-      console.error('TinyMCE init failed', err);
+      console.error('Editor42 init failed', err);
     });
   };
 
