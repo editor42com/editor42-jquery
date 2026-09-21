@@ -2,11 +2,11 @@
 import { Assertions } from '@ephox/agar';
 import { after, before, context, describe, it } from '@ephox/bedrock-client';
 import { setupIntegration } from '../../../main/ts/Integration';
-import { createEditor, removeTinymce } from '../Utils';
+import { createEditor, removeAllEngines } from '../Utils';
 
 describe('Check jQuery\'s `.val()` function', () => {
   before(setupIntegration);
-  after(removeTinymce);
+  after(removeAllEngines);
 
   context('passing no arguments to get the value', () => {
     it('gets the value of a input', () => {

@@ -2,11 +2,11 @@
 import { Assertions } from '@ephox/agar';
 import { after, before, context, describe, it } from '@ephox/bedrock-client';
 import { setupIntegration } from '../../../main/ts/Integration';
-import { createEditor, createHTML, removeTinymce } from '../Utils';
+import { createEditor, createHTML, removeAllEngines } from '../Utils';
 
 describe('Check jQuery\'s `.text()` function', () => {
   before(setupIntegration);
-  after(removeTinymce);
+  after(removeAllEngines);
 
   context('passing no arguments to get the text content', () => {
     it('gets the text content of a div', async () => {
@@ -31,7 +31,6 @@ describe('Check jQuery\'s `.text()` function', () => {
       await createHTML(`<section><div><p>Before</p></div><div id="editor"><p>Middle</p></div><div><p>After</p></div></section>`, async (root) => {
         const divs = $(root).find('div');
         const ed = (await $('#editor').tinymce({
-          license_key: 'gpl',
           script_url: '/project/node_modules/tinymce/tinymce.js',
         }))[0];
         try {
@@ -58,7 +57,6 @@ describe('Check jQuery\'s `.text()` function', () => {
       await createHTML(`<section><div>Before</div><div id="editor"></div></section>`, async (root) => {
         const divs = root.querySelectorAll('div');
         const ed = (await $('#editor').tinymce({
-          license_key: 'gpl',
           script_url: '/project/node_modules/tinymce/tinymce.js',
         }))[0];
         try {
@@ -87,7 +85,6 @@ describe('Check jQuery\'s `.text()` function', () => {
       await createHTML(`<section><div>Before</div><div id="editor"></div></section>`, async (root) => {
         const divs = root.querySelectorAll('div');
         const ed = (await $('#editor').tinymce({
-          license_key: 'gpl',
           script_url: '/project/node_modules/tinymce/tinymce.js',
         }))[0];
         try {
@@ -116,7 +113,6 @@ describe('Check jQuery\'s `.text()` function', () => {
       await createHTML(`<section><div>Before</div><div id="editor"></div></section>`, async (root) => {
         const divs = root.querySelectorAll('div');
         const ed = (await $('#editor').tinymce({
-          license_key: 'gpl',
           script_url: '/project/node_modules/tinymce/tinymce.js'
         }))[0];
         try {
@@ -157,7 +153,6 @@ describe('Check jQuery\'s `.text()` function', () => {
       await createHTML(`<section><div>Content</div><div id="editor">Content</div></section>`, async (root) => {
         const divs = root.querySelectorAll('div');
         const ed = (await $('#editor').tinymce({
-          license_key: 'gpl',
           script_url: '/project/node_modules/tinymce/tinymce.js'
         }))[0];
         try {
@@ -202,7 +197,6 @@ describe('Check jQuery\'s `.text()` function', () => {
       await createHTML(`<section><div>Content</div><div id="editor">Content</div></section>`, async (root) => {
         const divs = root.querySelectorAll('div');
         const ed = (await $('#editor').tinymce({
-          license_key: 'gpl',
           script_url: '/project/node_modules/tinymce/tinymce.js'
         }))[0];
         try {
@@ -248,7 +242,6 @@ describe('Check jQuery\'s `.text()` function', () => {
       await createHTML(`<section><div>Content</div><div id="editor">Content</div></section>`, async (root) => {
         const divs = root.querySelectorAll('div');
         const ed = (await $('#editor').tinymce({
-          license_key: 'gpl',
           script_url: '/project/node_modules/tinymce/tinymce.js'
         }))[0];
         try {

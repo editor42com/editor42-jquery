@@ -4,11 +4,11 @@ import { after, before, context, describe, it } from '@ephox/bedrock-client';
 import { SugarElement } from '@ephox/sugar';
 import type { Editor } from 'editor42';
 import { setupIntegration } from '../../../main/ts/Integration';
-import { createHTML, removeTinymce } from '../Utils';
+import { createHTML, removeAllEngines } from '../Utils';
 
 describe('Check jQuery\'s `.remove()` function', () => {
   before(setupIntegration);
-  after(removeTinymce);
+  after(removeAllEngines);
 
   context('calling on a node removes that node', () => {
     it('check works on a div', async () => {
@@ -37,7 +37,6 @@ describe('Check jQuery\'s `.remove()` function', () => {
         const target = $('div#target');
         const elm = $('textarea#editor');
         const ed = (await elm.tinymce({
-          license_key: 'gpl',
           script_url: '/project/node_modules/tinymce/tinymce.js',
         }))[0];
         try {
@@ -55,7 +54,6 @@ describe('Check jQuery\'s `.remove()` function', () => {
         const target = $('div#target');
         const elm = $('div#editor');
         const ed = (await elm.tinymce({
-          license_key: 'gpl',
           script_url: '/project/node_modules/tinymce/tinymce.js',
           inline: true
         }))[0];
@@ -82,15 +80,12 @@ describe('Check jQuery\'s `.remove()` function', () => {
         const eds: Editor[] = [];
         try {
           eds.push((await $('textarea#editor1').tinymce({
-            license_key: 'gpl',
             script_url: '/project/node_modules/tinymce/tinymce.js'
           }))[0]);
           eds.push((await $('textarea#editor2').tinymce({
-            license_key: 'gpl',
             script_url: '/project/node_modules/tinymce/tinymce.js'
           }))[0]);
           eds.push((await $('textarea#editor3').tinymce({
-            license_key: 'gpl',
             script_url: '/project/node_modules/tinymce/tinymce.js'
           }))[0]);
           Assertions.assertEq('Expected editor 1 to contain content', `<p>Content</p>`, eds[0].getContent());
@@ -119,17 +114,14 @@ describe('Check jQuery\'s `.remove()` function', () => {
         const eds: Editor[] = [];
         try {
           eds.push((await $('div#editor1').tinymce({
-            license_key: 'gpl',
             script_url: '/project/node_modules/tinymce/tinymce.js',
             inline: true
           }))[0]);
           eds.push((await $('div#editor2').tinymce({
-            license_key: 'gpl',
             script_url: '/project/node_modules/tinymce/tinymce.js',
             inline: true
           }))[0]);
           eds.push((await $('div#editor3').tinymce({
-            license_key: 'gpl',
             script_url: '/project/node_modules/tinymce/tinymce.js',
             inline: true
           }))[0]);
@@ -164,7 +156,6 @@ describe('Check jQuery\'s `.remove()` function', () => {
       await createHTML(`<section><textarea id="editor">&lt;p&gt;Content&lt;/p&gt;</textarea></section>`, async (root) => {
         const elm = $('textarea#editor');
         const ed = (await elm.tinymce({
-          license_key: 'gpl',
           script_url: '/project/node_modules/tinymce/tinymce.js'
         }))[0];
         try {
@@ -181,7 +172,6 @@ describe('Check jQuery\'s `.remove()` function', () => {
       await createHTML(`<section><div id="editor"><p>Content</p></div></section>`, async (root) => {
         const elm = $('div#editor');
         const ed = (await elm.tinymce({
-          license_key: 'gpl',
           script_url: '/project/node_modules/tinymce/tinymce.js',
           inline: true
         }))[0];
@@ -205,15 +195,12 @@ describe('Check jQuery\'s `.remove()` function', () => {
         const eds: Editor[] = [];
         try {
           eds.push((await $('textarea#editor1').tinymce({
-            license_key: 'gpl',
             script_url: '/project/node_modules/tinymce/tinymce.js'
           }))[0]);
           eds.push((await $('textarea#editor2').tinymce({
-            license_key: 'gpl',
             script_url: '/project/node_modules/tinymce/tinymce.js'
           }))[0]);
           eds.push((await $('textarea#editor3').tinymce({
-            license_key: 'gpl',
             script_url: '/project/node_modules/tinymce/tinymce.js'
           }))[0]);
           Assertions.assertEq('Expected editor 1 to contain content', `<p>Content</p>`, eds[0].getContent());
@@ -242,24 +229,19 @@ describe('Check jQuery\'s `.remove()` function', () => {
         const eds: Editor[] = [];
         try {
           eds.push((await $('div#editor1').tinymce({
-            license_key: 'gpl',
             script_url: '/project/node_modules/tinymce/tinymce.js',
             inline: true }))[0]);
           eds.push((await $('div#editor2').tinymce({
-            license_key: 'gpl',
             script_url: '/project/node_modules/tinymce/tinymce.js',
             inline: true }))[0]);
           eds.push((await $('div#editor3').tinymce({
-            license_key: 'gpl',
             script_url: '/project/node_modules/tinymce/tinymce.js',
             inline: true }))[0]);
           eds.push((await $('div#editor2').tinymce({
-            license_key: 'gpl',
             script_url: '/project/node_modules/tinymce/tinymce.js',
             inline: true
           }))[0]);
           eds.push((await $('div#editor3').tinymce({
-            license_key: 'gpl',
             script_url: '/project/node_modules/tinymce/tinymce.js',
             inline: true
           }))[0]);

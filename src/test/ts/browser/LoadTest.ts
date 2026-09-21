@@ -4,7 +4,7 @@ import { Class, Insert, Remove, SelectorFilter, SugarBody, SugarElement } from '
 import { setupIntegration } from '../../../main/ts/Integration';
 import { Arr } from '@ephox/katamari';
 import type { Editor } from 'editor42';
-import { removeTinymce } from '../Utils';
+import { removeAllEngines } from '../Utils';
 
 describe('LoadTest', () => {
   let editorInstance: Editor;
@@ -19,7 +19,6 @@ describe('LoadTest', () => {
     Insert.append(SugarBody.body(), ce);
     await new Promise<void>((resolve) => {
       $('div.test-editor').tinymce({
-        license_key: 'gpl',
         script_url: '/project/node_modules/tinymce/tinymce.js',
         init_instance_callback: (editor: Editor) => {
           editorInstance = editor;
@@ -36,7 +35,7 @@ describe('LoadTest', () => {
   after(() => {
     $('*:tinymce').remove();
     Arr.map(SelectorFilter.all('div.test-editor'), Remove.remove);
-    removeTinymce();
+    removeAllEngines();
   });
 
   it('can be retrieved from jQuery', () => {

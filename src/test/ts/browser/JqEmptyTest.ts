@@ -3,12 +3,12 @@ import { ApproxStructure, Assertions } from '@ephox/agar';
 import { SugarElement } from '@ephox/sugar';
 import type { Editor } from 'editor42';
 import { setupIntegration } from '../../../main/ts/Integration';
-import { createEditor, createHTML, removeTinymce } from '../Utils';
+import { createEditor, createHTML, removeAllEngines } from '../Utils';
 import { after, before, context, describe, it } from '@ephox/bedrock-client';
 
 describe('Check jQuery\'s `.empty()` function', () => {
   before(setupIntegration);
-  after(removeTinymce);
+  after(removeAllEngines);
 
   context('calling on a node with content removes that content', () => {
     it('check empty works on a div', () => {
@@ -37,7 +37,6 @@ describe('Check jQuery\'s `.empty()` function', () => {
       await createHTML(`<section><div id="editor"><p>Hello</p><p>World</p></div></section>`, async (root) => {
         const elm = $('div#editor');
         const ed = (await elm.tinymce({
-          license_key: 'gpl',
           script_url: '/project/node_modules/tinymce/tinymce.js',
           inline: true
         }))[0];
@@ -61,7 +60,6 @@ describe('Check jQuery\'s `.empty()` function', () => {
       await createHTML(`<section><div id="container"><p>Before</p><div><textarea id="editor">&lt;p&gt;Hello&lt;/p&gt;&lt;p&gt;World&lt;/p&gt;</textarea></div><p>After</p></div><p>Extra</p></section>`, async (root) => {
         const edElm = $('textarea#editor');
         const ed = (await edElm.tinymce({
-          license_key: 'gpl',
           script_url: '/project/node_modules/tinymce/tinymce.js',
         }))[0];
         try {
@@ -81,7 +79,6 @@ describe('Check jQuery\'s `.empty()` function', () => {
       await createHTML(`<section><div id="container"><p>Before</p><div><div id="editor"><p>Hello</p><p>World</p></div></div><p>After</p></div><p>Extra</p></section>`, async (root) => {
         const edElm = $('div#editor');
         const ed = (await edElm.tinymce({
-          license_key: 'gpl',
           script_url: '/project/node_modules/tinymce/tinymce.js',
           inline: true
         }))[0];
@@ -125,12 +122,10 @@ describe('Check jQuery\'s `.empty()` function', () => {
           const eds: Editor[] = [];
           try {
             eds.push(...await inline.tinymce({
-              license_key: 'gpl',
               script_url: '/project/node_modules/tinymce/tinymce.js',
               inline: true
             }));
             eds.push(...await normal.tinymce({
-              license_key: 'gpl',
               script_url: '/project/node_modules/tinymce/tinymce.js'
             }));
             for (let i = 0; i < eds.length; i++) {
@@ -158,7 +153,6 @@ describe('Check jQuery\'s `.empty()` function', () => {
       // eslint-disable-next-line max-len
       await createHTML(`<section><textarea class="editor">&lt;p&gt;Editor Content&lt;/p&gt;</textarea><div id="container"><p>Container Content</p></div><textarea class="editor">&lt;p&gt;Editor Content&lt;/p&gt;</textarea></section>`, async () => {
         const eds = await $('textarea.editor').tinymce({
-          license_key: 'gpl',
           script_url: '/project/node_modules/tinymce/tinymce.js',
         });
         try {
@@ -184,7 +178,6 @@ describe('Check jQuery\'s `.empty()` function', () => {
       // eslint-disable-next-line max-len
       await createHTML(`<section><div class="editor"><p>Editor Content</p></div><div id="container"><p>Container Content</p></div><div class="editor"><p>Editor Content</p></div></section>`, async () => {
         const eds = await $('div.editor').tinymce({
-          license_key: 'gpl',
           script_url: '/project/node_modules/tinymce/tinymce.js',
           inline: true
         });

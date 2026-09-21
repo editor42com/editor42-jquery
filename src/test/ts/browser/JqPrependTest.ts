@@ -2,11 +2,11 @@
 import { Assertions } from '@ephox/agar';
 import { after, before, context, describe, it } from '@ephox/bedrock-client';
 import { setupIntegration } from '../../../main/ts/Integration';
-import { createEditor, createHTML, removeTinymce } from '../Utils';
+import { createEditor, createHTML, removeAllEngines } from '../Utils';
 
 describe('Check jQuery\'s `.prepend()` function', () => {
   before(setupIntegration);
-  after(removeTinymce);
+  after(removeAllEngines);
 
   context('Prepend a string', () => {
     it('check that prepending to a div works', () => {

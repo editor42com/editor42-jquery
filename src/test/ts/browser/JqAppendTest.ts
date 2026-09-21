@@ -1,12 +1,12 @@
 
 import { Assertions } from '@ephox/agar';
 import { after, before, context, describe, it } from '@ephox/bedrock-client';
-import { createEditor, createHTML, removeTinymce } from '../Utils';
+import { createEditor, createHTML, removeAllEngines } from '../Utils';
 import { setupIntegration } from '../../../main/ts/Integration';
 
 describe('Check jQuery\'s `.append()` function', () => {
   before(setupIntegration);
-  after(removeTinymce);
+  after(removeAllEngines);
 
   context('Append a string', () => {
     it('check that appending to a div works', () => {

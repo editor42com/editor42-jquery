@@ -26,13 +26,28 @@ declare global {
 
 type AllInitFn = (editors: Editor[]) => void;
 
+// TinyMCE-style numeric channels have no meaning on cdn.editor42.com. Migrated code
+// that pinned one gets the stable 'latest' alias instead: the 42 major never breaks.
+const normalizeChannel = (channel: string | undefined): string => {
+  if (channel === undefined || channel === '') {
+    return 'latest';
+  }
+  if (/^[4-8]([.-]|$)/.test(channel)) {
+    // eslint-disable-next-line no-console
+    console.warn(`editor42-jquery: channel '${channel}' is a TinyMCE channel; loading 'latest' instead.`);
+    return 'latest';
+  }
+  return channel;
+};
+
 export const getScriptSrc = (settings: RawEditorExtendedSettings): string => {
   if (typeof settings.script_url === 'string') {
     return settings.script_url;
   } else {
-    const channel = typeof settings.channel === 'string' ? settings.channel : '8';
-    const apiKey = typeof settings.api_key === 'string' ? settings.api_key : 'no-api-key';
-    return `https://cdn.tiny.cloud/1/${apiKey}/tinymce/${channel}/tinymce.min.js`;
+    // the api_key setting was removed: it is accepted so existing code compiles, never
+    // read or sent; with no script_url the script comes from the editor42 cdn
+    const channel = normalizeChannel(typeof settings.channel === 'string' ? settings.channel : undefined);
+    return `https://cdn.editor42.com/editor42/${channel}/editor42.min.js`;
   }
 };
 
