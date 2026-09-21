@@ -6,6 +6,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## Unreleased
 
+## 1.0.0 - 2026-09-21
+
+### Changed
+- Forked @tinymce/tinymce-jquery 2.3.0 as @editor42/editor42-jquery, targeting Editor42.
+- The bundle is dist/editor42-jquery.js (dist/editor42-jquery.min.js minified) and package main points at it.
+- Added the editor42() jquery function and the :editor42 pseudo selector; tinymce() and :tinymce stay registered as deprecated aliases.
+- Renamed the identifiers this integration looks for: it resolves the editor42 global and falls back to a stock TinyMCE when that is what the page has loaded.
+- The no-script_url fallback loads from https://cdn.editor42.com on the latest channel and TinyMCE-style numeric channels resolve to latest.
+- Hardened the loader: a test-only reset hook, and the patched jquery functions no longer throw on a page whose engine was removed after patching.
+
+### Removed
+- All API-key and licence-key handling. The api_key setting is still accepted so existing code compiles, but no key is read, stored or sent, and no request reaches a vendor cloud.
+- Vendor CI, release tooling and the vendor cloud test matrix.
+
 ## 2.3.0 - 2026-05-28
 
 ### Changed
